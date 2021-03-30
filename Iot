@@ -1,0 +1,42 @@
+#include "Ubidots.h"
+#define TOKEN  "BBFF-hcGIN6q6hFR24qiMWUtEinvLIaXLe6"  // Poner aqui tu TOKEN general de Ubidots
+#define WIFISSID "NETLIFE-GOMEZ" // Poner aqui el nombre de tu Wi-Fi
+#define PASSWORD "1802308500001" // Poner aqui la clave de tu Wi-Fi
+#define VARIABLE "Sirena"
+#define DEVICE  "Iot"
+Ubidots client(TOKEN);
+
+int val=0;
+int pir=0;
+const int alarma=2;
+void setup(){
+    Serial.begin(115200);
+    client.wifiConnect(WIFISSID, PASSWORD);
+}
+
+void loop(){
+
+    float Sirena = client.get(DEVICE, VARIABLE);
+    if (Sirena!= ERROR_VALUE){
+      Serial.print(F(">>>>>>>>> VALOR OBTENIDO DEL SWITCH: "));
+      Serial.println(Sirena);
+    }else{
+      Serial.println(F("Error getting Sirena"));
+    }
+
+    if(Sirena==1){
+    digitalWrite(alarma,HIGH);    
+    }
+     else if(val==0)
+    {
+    
+    digitalWrite(alarma,LOW);
+    }
+
+    val=digitalRead(pir);
+    float Luz = analogRead(A0);
+    client.add("LUZ", Luz);
+    client.add("PRESENCIA",val);
+    client.send();
+    delay(2000);
+}
